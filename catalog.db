@@ -1,0 +1,9 @@
+import sqlite3
+
+def save_to_database(df_gas, df_ah, db_name="catalog.db"):
+    conn = sqlite3.connect(db_name)
+    # Save the dataframes as clean database tables
+    df_gas.to_sql("gas_furnaces", conn, if_exists="replace", index=False)
+    df_ah.to_sql("air_handlers", conn, if_exists="replace", index=False)
+    conn.close()
+    print("Database updated successfully!")

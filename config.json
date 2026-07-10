@@ -1,0 +1,7 @@
+{
+  "Amana_Split_Catalog": {
+    "model_prefixes": ["AMVT", "AHVE", "AMST", "AVPTC", "ASPT", "ARUF", "CAPT", "CHPF"],
+    "heat_kit_prefixes": ["HKTSD", "HKTPD", "HKS", "HKR"],
+    "voltage_patterns": ["208/230V", "115V", "460V"]
+  }
+}
