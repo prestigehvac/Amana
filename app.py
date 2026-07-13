@@ -255,7 +255,7 @@ else:
 conn.close()
 # sync refresh
 
-    st.subheader("Available Matchups & Customer Pricing")
-    st.dataframe(results, use_container_width=True)
+st.subheader("Available Matchups & Customer Pricing")
+st.dataframe(results, use_container_width=True)
 
 conn.close()
