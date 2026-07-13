@@ -265,9 +265,4 @@ else:
     st.dataframe(results, use_container_width=True)
 
 conn.close()
-# sync refresh
 
-st.subheader("Available Matchups & Customer Pricing")
-st.dataframe(results, use_container_width=True)
-
-conn.close()
