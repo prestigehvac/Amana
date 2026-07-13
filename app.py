@@ -2,8 +2,8 @@ import pdfplumber
 import pandas as pd
 import re
 import json
-import os
 import sqlite3
+import os
 import streamlit as st
 
 st.set_page_config(page_title="Prestige HVAC Quote Helper", layout="wide")
@@ -23,7 +23,6 @@ def load_catalog_config(config_path="config.json"):
         }
 
 def extract_amana_catalog_split(pdf_path):
-    # Load configuration parameters dynamically
     config = load_catalog_config()
     model_prefixes = tuple(config["model_prefixes"])
     heat_kit_prefixes = tuple(config["heat_kit_prefixes"])
@@ -77,7 +76,6 @@ def extract_amana_catalog_split(pdf_path):
                 if "HxWxD" in line or "System Notes:" in line or "Page" in line or not line or not inside_air_handler_grid:
                     continue
                 
-                # Pre-clean spacing boundaries using prefixes loaded from config
                 hk_pattern = "|".join(config["heat_kit_prefixes"])
                 line = re.sub(rf'((?:{hk_pattern})[A-Z0-9]*)\$', r'\1 $', line)
                 line = re.sub(r'(\d+)-\s*1/2', r'\1-1/2', line)
@@ -88,7 +86,6 @@ def extract_amana_catalog_split(pdf_path):
                 if len(tokens) >= 8:
                     prefix = tokens[0]
                     
-                    # --- GAS FURNACE LOGIC ---
                     if prefix.startswith(("ARVT", "AR9S")):
                         if len(tokens) >= 10 and tokens[2].startswith('$'):
                             furnace_model = tokens[0]
@@ -109,7 +106,6 @@ def extract_amana_catalog_split(pdf_path):
                                 evap_coil, evap_price, seer, eer, ccap, ahri, total
                             ])
                     
-                    # --- AIR HANDLER LOGIC ---
                     elif prefix.startswith(model_prefixes):
                         air_handler_model = tokens[0]
                         
@@ -129,7 +125,6 @@ def extract_amana_catalog_split(pdf_path):
                         equipment_tokens = tokens[:meta_offset]
                         equipment_part = " ".join(equipment_tokens)
                         
-                        # Dimension tracking
                         model_pattern = "|".join(config["model_prefixes"])
                         dim_match = re.search(rf'(?:{model_pattern})[A-Z0-9\-*]*\s+([\d\-xX/\"\']+)', line)
                         if dim_match:
@@ -189,16 +184,13 @@ if uploaded_file is not None:
                 f.write(uploaded_file.getbuffer())
             
             try:
-                # Process the file using the local extraction function
                 df_gas, df_ah = extract_amana_catalog_split(temp_pdf_path)
                 
-                # Overwrite the database with fresh data
-                conn = sqlite3.connect("catalog.db")
+                # Update spreadsheet in-memory storage if admin uploads a file
+                conn = sqlite3.connect(":memory:", check_same_thread=False)
                 df_gas.to_sql("gas_furnaces", conn, if_exists="replace", index=False)
                 df_ah.to_sql("air_handlers", conn, if_exists="replace", index=False)
-                conn.close()
-                
-                st.sidebar.success("Catalog updated successfully! Techs see new pricing now.")
+                st.sidebar.success("Catalog updated successfully!")
                 st.rerun()
             except Exception as e:
                 st.sidebar.error(f"Error processing PDF: {e}")
@@ -210,30 +202,34 @@ if uploaded_file is not None:
 # --- 2. TECHNICIAN INTERFACE ---
 st.title("⚡ Prestige Quick Quote Tool")
 
-# Open connection to read the database
-conn = sqlite3.connect("catalog.db")
+@st.cache_resource
+def get_database_connection():
+    conn = sqlite3.connect(":memory:", check_same_thread=False)
+    df_gas = pd.read_excel("Amana_Split_Pricing.xlsx", sheet_name="Gas Furnace Systems")
+    df_ah = pd.read_excel("Amana_Split_Pricing.xlsx", sheet_name="Air Handler Systems")
+    df_gas.to_sql("gas_furnaces", conn, if_exists="replace", index=False)
+    df_ah.to_sql("air_handlers", conn, if_exists="replace", index=False)
+    return conn
 
-# Verify the tables actually exist before running queries to avoid blank app errors
-table_check = pd.read_sql("SELECT name FROM sqlite_master WHERE type='table' AND name='air_handlers'", conn)
+conn = get_database_connection()
 
-if table_check.empty:
+# Flexible verification check
+inspector = pd.read_sql("SELECT name FROM sqlite_master WHERE type='table'", conn)
+existing_tables = inspector['name'].tolist()
+
+if not existing_tables:
     st.warning("⚠️ No catalog data found in the system database yet.")
-    st.info("💡 **Admin:** Use the left sidebar to upload your `Amana.pdf` distributor file and click **Process & Update Catalog** to build the database.")
 else:
-    # Select System Type
     system_type = st.selectbox("Select System Type", ["Air Handler Systems", "Gas Furnace Systems"])
     target_table = "air_handlers" if system_type == "Air Handler Systems" else "gas_furnaces"
     condenser_col = "Condenser/HP Model" if system_type == "Air Handler Systems" else "Condenser Model"
 
-    # Get unique tonnage options
     tonnages = pd.read_sql(f"SELECT DISTINCT Tonnage FROM {target_table}", conn)["Tonnage"].tolist()
     selected_ton = st.selectbox("Select Tonnage", tonnages)
     
-    # Filter condensers based on tonnage
     condensers = pd.read_sql(f"SELECT DISTINCT [{condenser_col}] FROM {target_table} WHERE Tonnage='{selected_ton}'", conn)[condenser_col].tolist()
     selected_condenser = st.selectbox("Select Condenser Model", condensers)
     
-    # Fetch matching matchups
     if system_type == "Air Handler Systems":
         query = f"SELECT [Air Handler Model], [Air Handler HxWxD], [Air Handler Price], [Heat Kit], [Heat Kit Price], [SEER(2)], [Total] FROM air_handlers WHERE [Condenser/HP Model]='{selected_condenser}'"
     else:
@@ -241,23 +237,23 @@ else:
         
     results = pd.read_sql(query, conn)
     
-    # --- 3. PRICING CALCULATOR CONFIGURATION ---
     st.sidebar.header("Pricing Calculator")
     markup_multiplier = st.sidebar.slider("Markup Multiplier", 1.0, 3.0, 1.5, step=0.1)
     flat_labor = st.sidebar.number_input("Flat Labor Cost ($)", value=1200)
 
-    # Apply math to results if database rows are returned
     if not results.empty:
-        # Clean currency strings to floats
-        raw_totals = results["Total"].str.replace('$', '', regex=False).str.replace(',', '', regex=False).astype(float)
-        
-        # Add new columns for your techs
+        raw_totals = results["Total"].astype(str).str.replace('$', '', regex=False).str.replace(',', '', regex=False).astype(float)
         results["Retail Equipment Price"] = raw_totals * markup_multiplier
         results["Total Customer Investment"] = results["Retail Equipment Price"] + flat_labor
         
-        # Re-format values into clean currency strings
         results["Retail Equipment Price"] = results["Retail Equipment Price"].map('${:,.2f}'.format)
         results["Total Customer Investment"] = results["Total Customer Investment"].map('${:,.2f}'.format)
+
+    st.subheader("Available Matchups & Customer Pricing")
+    st.dataframe(results, use_container_width=True)
+
+conn.close()
+# sync refresh
 
     st.subheader("Available Matchups & Customer Pricing")
     st.dataframe(results, use_container_width=True)
