@@ -202,15 +202,27 @@ if uploaded_file is not None:
 # --- 2. TECHNICIAN INTERFACE ---
 st.title("⚡ Prestige Quick Quote Tool")
 
-@st.cache_resource
-def get_database_connection():
-    conn = sqlite3.connect(":memory:", check_same_thread=False)
+# 1. Change the cache decorator to cache the dataframes instead of the connection
+@st.cache_data
+def load_excel_data():
     df_gas = pd.read_excel("Amana_Split_Pricing.xlsx", sheet_name="Gas Furnace Systems")
     df_ah = pd.read_excel("Amana_Split_Pricing.xlsx", sheet_name="Air Handler Systems")
+    return df_gas, df_ah
+
+# 2. Re-write your connection function to build a fresh database on every rerun
+def get_database_connection():
+    # Load the cached dataframes
+    df_gas, df_ah = load_excel_data()
+    
+    # Establish a fresh, live in-memory database
+    conn = sqlite3.connect(":memory:", check_same_thread=False)
+    
+    # Dump the dataframes into the live connection
     df_gas.to_sql("gas_furnaces", conn, if_exists="replace", index=False)
     df_ah.to_sql("air_handlers", conn, if_exists="replace", index=False)
     return conn
 
+# 3. Call your connection normally downstream
 conn = get_database_connection()
 
 # Flexible verification check
