@@ -239,16 +239,19 @@ else:
     tonnages = pd.read_sql(f"SELECT DISTINCT Tonnage FROM {target_table}", conn)["Tonnage"].tolist()
     selected_ton = st.selectbox("Select Tonnage", tonnages)
     
-    condensers = pd.read_sql(f"SELECT DISTINCT [{condenser_col}] FROM {target_table} WHERE Tonnage='{selected_ton}'", conn)[condenser_col].tolist()
+    # 1. Determine the price column dynamically
+    price_col = "Base Unit Price" if system_type == "Air Handler Systems" else "Condenser Price"
+        
+    # 2. Fetch the data as a DataFrame (make sure there is no .tolist() at the end)
+    condensers = pd.read_sql(f"SELECT DISTINCT [{condenser_col}], [{price_col}] FROM {target_table} WHERE Tonnage='{selected_ton}'", conn)
+        
+    # 3. Build the dropdown options safely
     if not condensers.empty:
-            # Create a display name combining the model and its price
-            condensers['display_name'] = condensers.apply(
-                lambda row: f"{row[condenser_col]} — {row['Condenser Price'] if 'Condenser Price' in row else row['Base Unit Price']}", axis=1
-            )
+            condensers['display_name'] = condensers[condenser_col] + " — " + condensers[price_col].astype(str)
             selected_display = st.selectbox("Select Condenser Model", condensers['display_name'])
             selected_condenser = selected_display.split(" — ")[0]
     else:
-            selected_condenser = st.selectbox("Select Condenser Model", [])
+            selected_condenser = None
     
     if system_type == "Air Handler Systems":
         query = f"SELECT [Air Handler Model], [Air Handler HxWxD], [Air Handler Price], [Heat Kit], [Heat Kit Price], [SEER(2)], [Total] FROM air_handlers WHERE [Condenser/HP Model]='{selected_condenser}'"
