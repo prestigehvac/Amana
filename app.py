@@ -276,7 +276,7 @@ else:
     st.dataframe(results, use_container_width=True)
 
     st.write("---")
-    st.subheader("📊 Condenser Models & Categories Reference")
+    st.subheader("Condenser Models & Categories Reference")
     st.markdown("""
     | Condenser Model | Category / Description |
     | :--- | :--- |
