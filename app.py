@@ -261,7 +261,7 @@ else:
     results = pd.read_sql(query, conn)
     
     st.sidebar.header("Pricing Calculator")
-    markup_multiplier = st.sidebar.slider("Markup Multiplier", 1.0, 3.0, 1.5, step=0.05)
+    markup_multiplier = st.sidebar.slider("Markup Multiplier", 1.0, 3.0, 1.8, step=0.05)
     flat_labor = st.sidebar.number_input("Labor & Material Cost ($)", value=1700)
 
     if not results.empty:
