@@ -247,7 +247,7 @@ else:
             )
             selected_display = st.selectbox("Select Condenser Model", condensers['display_name'])
             selected_condenser = selected_display.split(" — ")[0]
-        else:
+    else:
             selected_condenser = st.selectbox("Select Condenser Model", [])
     
     if system_type == "Air Handler Systems":
