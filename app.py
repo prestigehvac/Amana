@@ -240,7 +240,15 @@ else:
     selected_ton = st.selectbox("Select Tonnage", tonnages)
     
     condensers = pd.read_sql(f"SELECT DISTINCT [{condenser_col}] FROM {target_table} WHERE Tonnage='{selected_ton}'", conn)[condenser_col].tolist()
-    selected_condenser = st.selectbox("Select Condenser Model", condensers)
+    if not condensers.empty:
+            # Create a display name combining the model and its price
+            condensers['display_name'] = condensers.apply(
+                lambda row: f"{row[condenser_col]} — {row['Condenser Price'] if 'Condenser Price' in row else row['Base Unit Price']}", axis=1
+            )
+            selected_display = st.selectbox("Select Condenser Model", condensers['display_name'])
+            selected_condenser = selected_display.split(" — ")[0]
+        else:
+            selected_condenser = st.selectbox("Select Condenser Model", [])
     
     if system_type == "Air Handler Systems":
         query = f"SELECT [Air Handler Model], [Air Handler HxWxD], [Air Handler Price], [Heat Kit], [Heat Kit Price], [SEER(2)], [Total] FROM air_handlers WHERE [Condenser/HP Model]='{selected_condenser}'"
