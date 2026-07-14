@@ -200,7 +200,7 @@ if uploaded_file is not None:
 
 
 # --- 2. TECHNICIAN INTERFACE ---
-st.title("⚡ Prestige Quick Quote Tool")
+st.title("Prestige Quick Quote Tool")
 
 # 1. Change the cache decorator to cache the dataframes instead of the connection
 @st.cache_data
