@@ -264,5 +264,23 @@ else:
     st.subheader("Available Matchups & Customer Pricing")
     st.dataframe(results, use_container_width=True)
 
+    st.write("---")
+    st.subheader("📊 Condenser Models & Categories Reference")
+    st.markdown("""
+    | Condenser Model | Category / Description |
+    | :--- | :--- |
+    | **AXV9SA** | Up to 19 SEER2. Single Stage. Variable-Speed, Inverter Driven Split System Air Conditioner with R-32 Refrigerant. |
+    | **ALXT7C** | Up to 17.2 SEER2 Two-Stage High-Efficiency R-32 Split System Air Conditioner. |
+    | **AXV6SS** | High-Efficiency, Communicating, Variable-Speed, R-32 Inverter Driven Side Discharge Split System Air Conditioner. |
+    | **ALXS5B** | Up to 16.5 SEER2 Single Stage AC with R32 Refrigerant. |
+    | **ALXS4B** | Up to 15.2 SEER2 Single Stage AC with R-32 Refrigerant. |
+    | **AZV9S** | S-Series Up to 21 SEER2 Variable Capacity, Variable-Speed Heat Pump with R-32 Refrigerant. |
+    | **ALZT7C** | Up to 17.2 SEER2 Two-Stage High-Efficiency, Communicating, R-32 Split System Heat Pump. |
+    | **AZV7S** | S-Series Up to 19 SEER2 Enhanced High-Efficiency, Communicating, Variable-Speed, Inverter Driven Side Discharge Split System Heat Pump with R-32 Refrigerant. |
+    | **AZV6S** | S-Series 19 SEER2 High-Efficiency, Communicating, Variable-Speed, Inverter Driven Side Discharge Split System Heat Pump with R-32 Refrigerant. |
+    | **ALZS5B** | Up to 16 SEER2 Single Stage Single Phase Heat Pump with R-32 Refrigerant. |
+    | **ALZS4B** | Up to 15.2 SEER2 Single Stage Single Phase Heat Pump with R-32 Refrigerant. |
+    """)
+    
 conn.close()
 
