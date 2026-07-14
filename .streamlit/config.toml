@@ -1,5 +1,5 @@
 [theme]
 primaryColor = "#f70015"         # Your main company accent color (e.g., buttons, links)
-backgroundColor = "#FFFFFF"      # The main app background
-secondaryBackgroundColor = "#8eaff1" # Sidebar and input box backgrounds
-textColor = "#262730"            # Main text color
+backgroundColor = "#1c0b7c"      # The main app background
+secondaryBackgroundColor = "#1c65f8" # Sidebar and input box backgrounds
+textColor = "#fbfbfc"            # Main text color
