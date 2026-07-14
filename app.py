@@ -251,7 +251,7 @@ else:
     
     st.sidebar.header("Pricing Calculator")
     markup_multiplier = st.sidebar.slider("Markup Multiplier", 1.0, 3.0, 1.5, step=0.05)
-    flat_labor = st.sidebar.number_input("Labor & Markup Cost ($)", value=1200)
+    flat_labor = st.sidebar.number_input("Labor & Markup Cost ($)", value=1700)
 
     if not results.empty:
         raw_totals = results["Total"].astype(str).str.replace('$', '', regex=False).str.replace(',', '', regex=False).astype(float)
@@ -281,6 +281,6 @@ else:
     | **ALZS5B** | Up to 16 SEER2 Single Stage Single Phase Heat Pump with R-32 Refrigerant. |
     | **ALZS4B** | Up to 15.2 SEER2 Single Stage Single Phase Heat Pump with R-32 Refrigerant. |
     """)
-    
+
 conn.close()
 
