@@ -8,7 +8,7 @@ import streamlit as st
 
 st.set_page_config(
     page_title="Prestige HVAC Quote Helper", 
-    page_icon="https://prestigehvac.com/wp-content/uploads/2024/01/cropped-Prestige_Logo_Favicon-32x32.png",
+    page_icon="https://prestigehvac.com/wp-content/uploads/2026/06/prestige-logo-circle-1.jpg",
     layout="wide"
 )
 
