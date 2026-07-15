@@ -205,6 +205,14 @@ if uploaded_file is not None:
 
 # --- 2. TECHNICIAN INTERFACE ---
 st.title("Prestige Quick Quote Tool")
+col1, col2, col3 = st.columns([1, 2, 1])
+
+with col2:
+    # Display and center the logo using your WordPress URL
+    st.image(
+        "https://prestigehvac.com/wp-content/uploads/2026/06/prestige-logo-circle-1.jpg",
+        use_container_width=True
+    )
 
 # 1. Change the cache decorator to cache the dataframes instead of the connection
 @st.cache_data
