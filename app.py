@@ -6,7 +6,11 @@ import sqlite3
 import os
 import streamlit as st
 
-st.set_page_config(page_title="Prestige HVAC Quote Helper", layout="wide")
+st.set_page_config(
+    page_title="Prestige HVAC Quote Helper", 
+    page_icon="https://prestigehvac.com/wp-content/uploads/2024/01/cropped-Prestige_Logo_Favicon-32x32.png",
+    layout="wide"
+)
 
 def load_catalog_config(config_path="config.json"):
     """Loads layout rules from an external JSON file. 
