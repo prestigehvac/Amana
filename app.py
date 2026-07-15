@@ -205,7 +205,7 @@ if uploaded_file is not None:
 
 # --- 2. TECHNICIAN INTERFACE ---
 st.title("Prestige Quick Quote Tool")
-col1, col2, col3 = st.columns([1, 2, 1])
+col1, col2, col3 = st.columns([3.5, 3, 3.5])
 
 with col2:
     # Display and center the logo using your WordPress URL
