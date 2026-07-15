@@ -204,8 +204,7 @@ if uploaded_file is not None:
 
 
 # --- 2. TECHNICIAN INTERFACE ---
-st.title("Prestige Quick Quote Tool")
-col1, col2, col3 = st.columns([3.75, 2.5, 3.75])
+col1, col2, col3 = st.columns([4.25, 1.5, 4.25])
 
 with col2:
     # Display and center the logo above the title
@@ -213,6 +212,9 @@ with col2:
         "https://prestigehvac.com/wp-content/uploads/2026/06/prestige-logo-circle-1.jpg",
         use_container_width=True
     )
+
+# Placing st.title AFTER the logo columns forces it to sit underneath the logo
+st.title("Prestige Quick Quote Tool")
 
 # 1. Change the cache decorator to cache the dataframes instead of the connection
 @st.cache_data
