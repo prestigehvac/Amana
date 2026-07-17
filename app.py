@@ -177,30 +177,37 @@ def extract_amana_catalog_split(pdf_path):
 
 
 # --- 1. ADMIN SECTION FOR BACKEND PDF UPLOADS ---
+# --- 1. ADMIN SECTION FOR BACKEND PDF UPLOADS ---
 st.sidebar.title("⚙️ Admin Controls")
-uploaded_file = st.sidebar.file_uploader("Upload New Distributor Pricing PDF", type=["pdf"])
 
-if uploaded_file is not None:
-    if st.sidebar.button("🚀 Process & Update Catalog"):
-        with st.spinner("Parsing new PDF data and updating database..."):
-            temp_pdf_path = "temp_uploaded_catalog.pdf"
-            with open(temp_pdf_path, "wb") as f:
-                f.write(uploaded_file.getbuffer())
-            
-            try:
-                df_gas, df_ah = extract_amana_catalog_split(temp_pdf_path)
-                
-                # Update spreadsheet in-memory storage if admin uploads a file
-                conn = sqlite3.connect(":memory:", check_same_thread=False)
-                df_gas.to_sql("gas_furnaces", conn, if_exists="replace", index=False)
-                df_ah.to_sql("air_handlers", conn, if_exists="replace", index=False)
-                st.sidebar.success("Catalog updated successfully!")
-                st.rerun()
-            except Exception as e:
-                st.sidebar.error(f"Error processing PDF: {e}")
-            finally:
-                if os.path.exists(temp_pdf_path):
-                    os.remove(temp_pdf_path)
+# Simple password protection ONLY for the file uploader
+admin_password = st.sidebar.text_input("Enter Admin Password to Upload Files", type="password")
+
+if admin_password == "Pr3st1g375098":
+    uploaded_file = st.sidebar.file_uploader("Upload New Distributor Pricing PDF", type=["pdf"])
+    
+    if uploaded_file is not None:
+        if st.sidebar.button("Process & Update Catalog"):
+            with st.spinner("Parsing new PDF data and updating database..."):
+                temp_pdf_path = "temp_uploaded_catalog.pdf"
+                with open(temp_pdf_path, "wb") as f:
+                    f.write(uploaded_file.getbuffer())
+                try:
+                    df_gas, df_ah = extract_amana_catalog_split(temp_pdf_path)
+                    conn = sqlite3.connect(":memory:", check_same_thread=False)
+                    df_gas.to_sql("gas_furnaces", conn, if_exists="replace", index=False)
+                    df_ah.to_sql("air_handlers", conn, if_exists="replace", index=False)
+                    st.sidebar.success("Catalog updated successfully!")
+                    st.rerun()
+                except Exception as e:
+                    st.sidebar.error(f"Error processing PDF: {e}")
+                finally:
+                    if os.path.exists(temp_pdf_path):
+                        os.remove(temp_pdf_path)
+else:
+    uploaded_file = None
+    if admin_password: # Only show error if they actually typed something wrong
+        st.sidebar.error("Incorrect Password")
 
 
 # --- 2. TECHNICIAN INTERFACE ---
