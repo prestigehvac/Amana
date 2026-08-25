@@ -1,0 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+html, body, [data-testid="stAppViewContainer"] {
+    font-family: 'Montserrat', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6, label, .stSelectbox label {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700 !important;
+}
