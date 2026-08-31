@@ -282,8 +282,8 @@ else:
     results = pd.read_sql(query, conn)
     
     st.sidebar.header("Pricing Calculator")
-    markup_multiplier = st.sidebar.slider("Markup Multiplier", 1.0, 3.0, 1.95, step=0.05)
-    flat_labor = st.sidebar.number_input("Labor & Material Cost ($)", value=3258)
+    markup_multiplier = st.sidebar.slider("Markup Multiplier", 1.0, 3.0, 2.10, step=0.05)
+    flat_labor = st.sidebar.number_input("Labor & Material Cost ($)", value=3458)
 
     if not results.empty:
         raw_totals = results["Total"].astype(str).str.replace('$', '', regex=False).str.replace(',', '', regex=False).astype(float)
